@@ -4,8 +4,9 @@ class SessionsController < ApplicationController
   end
 
   def create
-  	user = User.find_by_email(params[:session][:email].downcase)
-    if user && user.authenticate(params[:session][:password])
+    # note: form_tag took out :sessions here which seemed to make it simpler - Exercise 8.5
+  	user = User.find_by_email(params[:email].downcase)
+    if user && user.authenticate(params[:password])
       sign_in user
       redirect_to user
     else
