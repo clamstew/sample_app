@@ -16,7 +16,7 @@ test:
   adapter: postgresql
   host: localhost
   username: claymstewart
-  database: sample_app_development
+  database: sample_app_testing
 
 production:
   adapter: sqlite3
