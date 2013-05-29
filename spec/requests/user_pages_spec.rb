@@ -140,4 +140,39 @@ describe "User pages" do
       specify { user.reload.email.should == new_email }
     end
   end
+
+  describe "destroy" do
+    let!(:admin) { FactoryGirl.create(:admin) }
+
+    before do
+      sign_in admin
+    end
+
+    it "should delete a normal user" do
+      user = FactoryGirl.create(:user)
+      expect { delete user_path(user), {},
+       'HTTP_COOKIE' => "remember_token=#{admin.remember_token},
+        #{Capybara.current_session.driver.response.headers["Set-Cookie"]}" }.
+        to change(User, :count).by(-1)
+    end
+
+    it "should not allow the admin to delete herself" do
+      expect { delete user_path(admin), {},
+       'HTTP_COOKIE' => "remember_token=#{admin.remember_token},
+        #{Capybara.current_session.driver.response.headers["Set-Cookie"]}" }.
+       to_not change(User, :count)
+    end
+  end
+
+  # go this from: 
+  # http://stackoverflow.com/questions/14640214/how-do-i-redirect-signed-in-users-attempt-to-access-user-new-and-user-create-in
+  describe "after signing-in" do
+    let(:user) { FactoryGirl.create(:user) }
+    before { sign_in user }
+
+    describe "creating a new user" do
+      before { get new_user_path }
+      specify { response.should redirect_to(root_url) }
+    end
+  end
 end
