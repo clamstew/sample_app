@@ -192,4 +192,27 @@ describe "User pages" do
       it { should have_content(user.microposts.count) }
     end
   end
+
+  # test block created in Ch 10 Exercise 4
+  # to test: 4. Write a test to make sure delete links do not appear for microposts not created by the current user.
+  describe "other user profile page" do 
+    let(:user) { FactoryGirl.create(:user) }
+    let(:user2) { FactoryGirl.create(:user) }
+    let!(:m1) { FactoryGirl.create(:micropost, user: user, content: "Foo") }
+    let!(:m2) { FactoryGirl.create(:micropost, user: user, content: "Bar") }
+    let!(:m3) { FactoryGirl.create(:micropost, user: user2, content: "Foo2") }
+    let!(:m4) { FactoryGirl.create(:micropost, user: user2, content: "Bar2") }
+
+    before { visit user_path(user2) }
+
+    it { should have_selector('h1',    text: user2.name) }
+    it { should have_selector('title', text: user2.name) }
+
+    describe "other user microposts" do
+      it { should have_content(m1.content) }
+      it { should have_content(m2.content) }
+      it { should have_content(user.microposts.count) }
+      it { should_not have_link('delete', href: micropost_path(m3)) }
+    end
+  end
 end
